@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	flag "github.com/spf13/pflag"
 )
@@ -14,7 +15,7 @@ import (
 // definition to ensure usability.
 //
 // Command 结构定义了应用程序所使用的指令，提供了 usage 以及一些其他描述性的接口。
-// 这个结构是 cobra.Command 结构的简化版本，提供了记录子命令、父命令等相关字段
+// 这个结构是 cobra.Command 结构的简化版本，提供了记录子命令、父命令、帮助描述等相关字段。
 type Command struct {
 	// Use is the one-line usage message.
 	// Recommended syntax is as follow:
@@ -26,10 +27,8 @@ type Command struct {
 	//       optional, they are enclosed in brackets ([ ]).
 	// Example: add [-F file | -D dir]... [-f format] profile
 	Use string
-
 	// Short is the short description shown in the 'help' output.
 	Short string
-
 	// Long is the long message shown in the 'help <this-command>' output.
 	Long string
 
@@ -38,123 +37,99 @@ type Command struct {
 
 	// args is actual args parsed from flags.
 	args []string
+	// flags is full set of flags.
+	// flags *flag.FlagSet
+
+	// parent is a parent command for this command.
+	parent *Command
+	// commands is the list of commands supported by this program.
+	commands []*Command
 }
 
 // Execute executes the command.
-func (c *Command) Execute() error {
-	args := c.args
+func (cmd *Command) Execute() error {
+	args := cmd.args
 	// Workaround FAIL with "go test -v" or "cobra.test -test.v", see #155
-	if c.args == nil && filepath.Base(os.Args[0]) != "cobra.test" {
+	if cmd.args == nil && filepath.Base(os.Args[0]) != "cobra.test" {
 		args = os.Args[1:]
 	}
-	// TODO: c.Find(args)
-	// cmd, _, err := c.Find(args)
-	// if err != nil {
-	// 	// If found parse to a subcommand and then failed, talk about the subcommand
-	// 	if cmd != nil {
-	// 		c = cmd
-	// 	}
-	// 	return err
-	// }
-	// err = c.execute(args)
-	err := c.execute(args)
+	targetCmd, flags, err := cmd.Find(args)
+	if err != nil {
+		return err
+	}
+	err = targetCmd.execute(flags)
 	if err != nil {
 		// Always show help if requested, even if SilenceErrors is in effect
 		if err == flag.ErrHelp {
-			// cmd.HelpFunc()(cmd, args)
+			// targetCmd.HelpFunc()(cmd, args)
 			return nil
 		}
 	}
 	return err
 }
 
-func (c *Command) execute(a []string) (err error) {
-	if c == nil {
+func (cmd *Command) execute(a []string) (err error) {
+	if cmd == nil {
 		return fmt.Errorf("Called Execute() on a nil Command")
 	}
-	c.Run(c, a)
+	cmd.Run(cmd, a)
 	return nil
 }
 
-// // Find the target command given the args and command tree
-// // Meant to be run on the highest node. Only searches down.
-// func (c *Command) Find(args []string) (*Command, []string, error) {
-// 	var innerfind func(*Command, []string) (*Command, []string)
+// Find the target command given the args and command tree
+// Meant to be run on the highest node. Only searches down.
+//
+// Find 函数为用户输入的 cmd 指令，找到并返回最终执行的子指令，并将剩余的参数作为 flags 返回
+func (cmd *Command) Find(args []string) (*Command, []string, error) {
+	var innerfind func(*Command, []string) (*Command, []string)
+	innerfind = func(cmd *Command, innerArgs []string) (*Command, []string) {
+		// argsWOflags := stripFlags(innerArgs, cmd)
+		// args without flags
+		argsWOflags := innerArgs
+		if len(argsWOflags) == 0 {
+			return cmd, innerArgs
+		}
+		nextSubCmd := argsWOflags[0]
+		targetCmd := cmd.findNext(nextSubCmd)
+		if targetCmd != nil {
+			return innerfind(targetCmd, argsMinusFirstX(innerArgs, nextSubCmd))
+		}
+		return cmd, innerArgs
+	}
+	commandFound, flags := innerfind(cmd, args)
+	return commandFound, flags, nil
+}
 
-// 	innerfind = func(c *Command, innerArgs []string) (*Command, []string) {
-// 		argsWOflags := stripFlags(innerArgs, c)
-// 		if len(argsWOflags) == 0 {
-// 			return c, innerArgs
-// 		}
-// 		nextSubCmd := argsWOflags[0]
+func (cmd *Command) findNext(next string) *Command {
+	for _, cmd := range cmd.commands {
+		if cmd.Name() == next {
+			return cmd
+		}
+	}
+	return nil
+}
 
-// 		cmd := c.findNext(nextSubCmd)
-// 		if cmd != nil {
-// 			return innerfind(cmd, argsMinusFirstX(innerArgs, nextSubCmd))
-// 		}
-// 		return c, innerArgs
-// 	}
+// Name returns the command's name: the first word in the use line.
+//
+// Name 函数通过 Command.Use 字段返回 command 的名字（use 的首单词）
+func (cmd *Command) Name() string {
+	name := cmd.Use
+	i := strings.Index(name, " ")
+	if i >= 0 {
+		name = name[:i]
+	}
+	return name
+}
 
-// 	commandFound, a := innerfind(c, args)
-// 	if commandFound.Args == nil {
-// 		return commandFound, a, legacyArgs(commandFound, stripFlags(a, commandFound))
-// 	}
-// 	return commandFound, a, nil
-// }
-
-// func stripFlags(args []string, c *Command) []string {
-// 	if len(args) == 0 {
-// 		return args
-// 	}
-
-// 	commands := []string{}
-// 	flags := c.Flags()
-
-// Loop:
-// 	for len(args) > 0 {
-// 		s := args[0]
-// 		args = args[1:]
-// 		switch {
-// 		case s == "--":
-// 			// "--" terminates the flags
-// 			break Loop
-// 		case strings.HasPrefix(s, "--") && !strings.Contains(s, "=") && !hasNoOptDefVal(s[2:], flags):
-// 			// If '--flag arg' then
-// 			// delete arg from args.
-// 			fallthrough // (do the same as below)
-// 		case strings.HasPrefix(s, "-") && !strings.Contains(s, "=") && len(s) == 2 && !shortHasNoOptDefVal(s[1:], flags):
-// 			// If '-f arg' then
-// 			// delete 'arg' from args or break the loop if len(args) <= 1.
-// 			if len(args) <= 1 {
-// 				break Loop
-// 			} else {
-// 				args = args[1:]
-// 				continue
-// 			}
-// 		case s != "" && !strings.HasPrefix(s, "-"):
-// 			commands = append(commands, s)
-// 		}
-// 	}
-
-// 	return commands
-// }
-
-// func hasNoOptDefVal(name string, fs *flag.FlagSet) bool {
-// 	flag := fs.Lookup(name)
-// 	if flag == nil {
-// 		return false
-// 	}
-// 	return flag.NoOptDefVal != ""
-// }
-
-// func shortHasNoOptDefVal(name string, fs *flag.FlagSet) bool {
-// 	if len(name) == 0 {
-// 		return false
-// 	}
-
-// 	flag := fs.ShorthandLookup(name[:1])
-// 	if flag == nil {
-// 		return false
-// 	}
-// 	return flag.NoOptDefVal != ""
-// }
+// AddCommand adds one or more commands to this parent command.
+//
+// AddCommand 函数为 cmd 指令增加子指令
+func (cmd *Command) AddCommand(subCmds ...*Command) {
+	for i, subCmd := range subCmds {
+		if subCmds[i] == cmd {
+			panic("Command can't be a child of itself")
+		}
+		subCmds[i].parent = cmd
+		cmd.commands = append(cmd.commands, subCmd)
+	}
+}
