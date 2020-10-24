@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	flag "github.com/spf13/pflag"
 )
@@ -39,6 +38,9 @@ type Command struct {
 
 	// helpFunc is help func defined by user.
 	helpFunc func(*Command, []string)
+	// helpCommand is command with usage 'help'. If it's not defined by user,
+	// cobra uses default help command.
+	helpCommand *Command
 
 	// args is actual args parsed from flags.
 	args []string
@@ -53,6 +55,7 @@ type Command struct {
 
 // Execute executes the command.
 func (cmd *Command) Execute() error {
+	cmd.InitDefaultHelpCmd()
 	args := cmd.args
 	// Workaround FAIL with "go test -v" or "cobra.test -test.v", see #155
 	if cmd.args == nil && filepath.Base(os.Args[0]) != "cobra.test" {
@@ -95,7 +98,6 @@ func (cmd *Command) execute(a []string) (err error) {
 func (cmd *Command) Find(args []string) (*Command, []string, error) {
 	var innerfind func(*Command, []string) (*Command, []string)
 	innerfind = func(cmd *Command, innerArgs []string) (*Command, []string) {
-		// argsWOflags := stripFlags(innerArgs, cmd)
 		// args without flags
 		argsWOflags := innerArgs
 		if len(argsWOflags) == 0 {
@@ -119,61 +121,4 @@ func (cmd *Command) findNext(next string) *Command {
 		}
 	}
 	return nil
-}
-
-// Name returns the command's name: the first word in the use line.
-//
-// Name 函数通过 Command.Use 字段返回 command 的名字（use 的首单词）
-func (cmd *Command) Name() string {
-	name := cmd.Use
-	i := strings.Index(name, " ")
-	if i >= 0 {
-		name = name[:i]
-	}
-	return name
-}
-
-// AddCommand adds one or more commands to this parent command.
-//
-// AddCommand 函数为 cmd 指令增加子指令
-func (cmd *Command) AddCommand(subCmds ...*Command) {
-	for i, subCmd := range subCmds {
-		if subCmds[i] == cmd {
-			panic("Command can't be a child of itself")
-		}
-		subCmds[i].parent = cmd
-		cmd.commands = append(cmd.commands, subCmd)
-	}
-}
-
-// HelpFunc returns either the function set by SetHelpFunc for this command
-// or a parent, or it returns a function with default help behavior.
-func (cmd *Command) HelpFunc() func(*Command, []string) {
-	if cmd.helpFunc != nil {
-		return cmd.helpFunc
-	}
-	if cmd.parent != nil {
-		return cmd.parent.HelpFunc()
-	}
-	return func(cmd *Command, a []string) {
-		if cmd.Long != "" {
-			fmt.Println(cmd.Long)
-		}
-		if cmd.Use != "" {
-			fmt.Println("Usage:")
-			fmt.Printf("  %s\n\n", cmd.Use)
-		}
-		if len(cmd.commands) != 0 {
-			fmt.Println("Available Commands:")
-			for _, subCmd := range cmd.commands {
-				fmt.Printf("  %-10s %s\n", subCmd.Name(), subCmd.Short)
-			}
-			fmt.Printf("Use \"%s [command] --help\" for more information about a command.\n", cmd.Name())
-		}
-	}
-}
-
-// Runnable determines if the command is itself runnable.
-func (cmd *Command) Runnable() bool {
-	return cmd.Run != nil || cmd.RunE != nil
 }
