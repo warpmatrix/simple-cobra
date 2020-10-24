@@ -34,10 +34,15 @@ type Command struct {
 
 	// Run: Typically the actual work function. Most commands will only implement this.
 	Run func(cmd *Command, args []string)
+	// RunE: Run but returns an error.
+	RunE func(cmd *Command, args []string) error
+
+	// helpFunc is help func defined by user.
+	helpFunc func(*Command, []string)
 
 	// args is actual args parsed from flags.
 	args []string
-	// flags is full set of flags.
+	// flags is full secom/warpmatrix/simple-cobra"t of flags.
 	// flags *flag.FlagSet
 
 	// parent is a parent command for this command.
@@ -61,7 +66,7 @@ func (cmd *Command) Execute() error {
 	if err != nil {
 		// Always show help if requested, even if SilenceErrors is in effect
 		if err == flag.ErrHelp {
-			// targetCmd.HelpFunc()(cmd, args)
+			targetCmd.HelpFunc()(targetCmd, args)
 			return nil
 		}
 	}
@@ -71,6 +76,13 @@ func (cmd *Command) Execute() error {
 func (cmd *Command) execute(a []string) (err error) {
 	if cmd == nil {
 		return fmt.Errorf("Called Execute() on a nil Command")
+	}
+	if !cmd.Runnable() {
+		return flag.ErrHelp
+	}
+	if cmd.RunE != nil {
+		err := cmd.RunE(cmd, a)
+		return err
 	}
 	cmd.Run(cmd, a)
 	return nil
@@ -132,4 +144,36 @@ func (cmd *Command) AddCommand(subCmds ...*Command) {
 		subCmds[i].parent = cmd
 		cmd.commands = append(cmd.commands, subCmd)
 	}
+}
+
+// HelpFunc returns either the function set by SetHelpFunc for this command
+// or a parent, or it returns a function with default help behavior.
+func (cmd *Command) HelpFunc() func(*Command, []string) {
+	if cmd.helpFunc != nil {
+		return cmd.helpFunc
+	}
+	if cmd.parent != nil {
+		return cmd.parent.HelpFunc()
+	}
+	return func(cmd *Command, a []string) {
+		if cmd.Long != "" {
+			fmt.Println(cmd.Long)
+		}
+		if cmd.Use != "" {
+			fmt.Println("Usage:")
+			fmt.Printf("  %s\n\n", cmd.Use)
+		}
+		if len(cmd.commands) != 0 {
+			fmt.Println("Available Commands:")
+			for _, subCmd := range cmd.commands {
+				fmt.Printf("  %-10s %s\n", subCmd.Name(), subCmd.Short)
+			}
+			fmt.Printf("Use \"%s [command] --help\" for more information about a command.\n", cmd.Name())
+		}
+	}
+}
+
+// Runnable determines if the command is itself runnable.
+func (cmd *Command) Runnable() bool {
+	return cmd.Run != nil || cmd.RunE != nil
 }
