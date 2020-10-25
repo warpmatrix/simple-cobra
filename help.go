@@ -4,6 +4,8 @@ import "fmt"
 
 // HelpFunc returns either the function set by SetHelpFunc for this command
 // or a parent, or it returns a function with default help behavior.
+//
+// HelpFunc 函数返回执行 help 指令的函数，可以被用户自定义或继承实现
 func (cmd *Command) HelpFunc() func(*Command, []string) {
 	if cmd.helpFunc != nil {
 		return cmd.helpFunc
@@ -24,15 +26,16 @@ func (cmd *Command) HelpFunc() func(*Command, []string) {
 			for _, subCmd := range cmd.commands {
 				fmt.Printf("  %-10s %s\n", subCmd.Name(), subCmd.Short)
 			}
+			fmt.Println("")
 			fmt.Printf("Use \"%s help [command] \" for more information about a command.\n", cmd.Name())
 		}
 	}
 }
 
-// InitDefaultHelpCmd adds default help command to c.
+// initDefaultHelpCmd adds default help command to c.
 // It is called automatically by executing the c or by calling help and usage.
 // If c already has help command or c has no subcommands, it will do nothing.
-func (cmd *Command) InitDefaultHelpCmd() {
+func (cmd *Command) initDefaultHelpCmd() {
 	if len(cmd.commands) == 0 {
 		return
 	}
@@ -56,4 +59,11 @@ Simply type ` + cmd.Name() + ` help [path to command] for full details.`,
 	}
 	cmd.RemoveCommand(cmd.helpCommand)
 	cmd.AddCommand(cmd.helpCommand)
+}
+
+// SetHelpFunc sets help function. Can be defined by Application.
+//
+// SetHelpFunc 函数可以让用户自定义 helpFunc 字段
+func (cmd *Command) SetHelpFunc(f func(*Command, []string)) {
+	cmd.helpFunc = f
 }

@@ -1,0 +1,435 @@
+using GOPATH mode
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#375EAB">
+
+	<title>cobra - Go Documentation Server</title>
+
+	<link type="text/css" rel="stylesheet" href="doc/style.css">
+
+	<script>window.initFuncs = [];</script>
+	<script src="doc/jquery.js" defer></script>
+
+
+
+	<script>var goVersion = "go1.15.2";</script>
+	<script src="doc/godocs.js" defer></script>
+</head>
+
+<body>
+
+	<div id='lowframe'
+		style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+		...
+	</div><!-- #lowframe -->
+
+	<div id="topbar" class="wide">
+		<div class="container">
+			<div class="top-heading" id="heading-wide"><a href="/pkg/">Go Documentation Server</a></div>
+			<div class="top-heading" id="heading-narrow"><a href="/pkg/">GoDoc</a></div>
+			<a href="#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+			<form method="GET" action="/search">
+				<div id="menu">
+
+					<span class="search-box"><input type="search" id="search" name="q" placeholder="Search"
+							aria-label="Search" required><button type="submit"><span>
+								<!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24">
+									<title>submit search</title>
+									<path
+										d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+									<path d="M0 0h24v24H0z" fill="none" />
+								</svg></span></button></span>
+				</div>
+			</form>
+
+		</div>
+	</div>
+
+
+
+	<div id="page" class="wide">
+		<div class="container">
+
+
+			<h1>
+				Package cobra
+				<span class="text-muted"></span>
+			</h1>
+
+
+
+
+
+
+
+			<div id="nav"></div>
+
+
+			<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+			<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+			<script>
+				document.ANALYSIS_DATA = null;
+				document.CALLGRAPH = null;
+			</script>
+
+
+
+			<div id="short-nav">
+				<dl>
+					<dd><code>import "github.com/warpmatrix/simple-cobra"</code></dd>
+				</dl>
+				<dl>
+					<dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+					<dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+
+
+				</dl>
+			</div>
+			<!-- The package's Name is printed as title by the top-level template -->
+			<div id="pkg-overview" class="toggleVisible">
+				<div class="collapsed">
+					<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+				</div>
+				<div class="expanded">
+					<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+					<p>
+						Package cobra 实现了支持简单带子命令的命令行程序开发的功能。
+						支持导入子命令目录，为开发的应用程序增加需要的自定义子命令。
+						所有的子命令文件夹中，一个 go 文件对应应用程序中的一个子命令。
+						可以通过增加或删除 go 文件，对直接对应用程序中的子命令进行改动。
+					</p>
+
+
+				</div>
+			</div>
+
+			<div id="pkg-index" class="toggleVisible">
+				<div class="collapsed">
+					<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+				</div>
+				<div class="expanded">
+					<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+					<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+					<div id="manual-nav">
+						<dl>
+
+
+
+
+
+							<dd><a href="#Command">type Command</a></dd>
+
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.AddCommand">func (cmd *Command) AddCommand(subCmds
+									...*Command)</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.Execute">func (cmd *Command) Execute() error</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.Find">func (cmd *Command) Find(args []string) (*Command,
+									[]string, error)</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.HelpFunc">func (cmd *Command) HelpFunc() func(*Command,
+									[]string)</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.Name">func (cmd *Command) Name() string</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.RemoveCommand">func (cmd *Command) RemoveCommand(rmCmds
+									...*Command)</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.Root">func (cmd *Command) Root() *Command</a></dd>
+
+
+							<dd>&nbsp; &nbsp; <a href="#Command.SetHelpFunc">func (cmd *Command) SetHelpFunc(f
+									func(*Command, []string))</a></dd>
+
+
+
+						</dl>
+					</div><!-- #manual-nav -->
+
+
+
+
+					<h3>Package files</h3>
+					<p>
+						<span style="font-size:90%">
+
+							<a href="/src/github.com/warpmatrix/simple-cobra/command.go">command.go</a>
+
+							<a href="/src/github.com/warpmatrix/simple-cobra/help.go">help.go</a>
+
+							<a href="/src/github.com/warpmatrix/simple-cobra/utils.go">utils.go</a>
+
+						</span>
+					</p>
+
+				</div><!-- .expanded -->
+			</div><!-- #pkg-index -->
+
+
+
+
+
+
+
+
+
+			<h2 id="Command">type <a
+					href="/src/github.com/warpmatrix/simple-cobra/command.go?s=928:3274#L12">Command</a>
+				<a class="permalink" href="#Command">&#xb6;</a>
+
+
+			</h2>
+			<p>
+				Command is just that, a command for your application.
+				E.g. &#39;go run ...&#39; - &#39;run&#39; is the command. Cobra requires
+				you to define the usage and description as part of your command
+				definition to ensure usability.
+			</p>
+			<p>
+				Command 结构定义了应用程序所使用的指令，提供了 usage 以及一些其他描述性的接口。
+				这个结构是 cobra.Command 结构的简化版本，提供了记录子命令、父命令、帮助描述等相关字段。
+			</p>
+
+			<pre>type Command struct {
+<span id="Command.Use"></span>    <span class="comment">// Use is the one-line usage message.</span>
+    <span class="comment">// Recommended syntax is as follow:</span>
+    <span class="comment">// Use 字段描述指令的使用格式，支持的格式如下：</span>
+    <span class="comment">//   [ ] identifies an optional argument. Arguments that are not enclosed in brackets are required.（可选参数）</span>
+    <span class="comment">//   ... indicates that you can specify multiple values for the previous argument.（多值参数）</span>
+    <span class="comment">//   |   indicates mutually exclusive information. You can use the argument to the left of the separator or the</span>
+    <span class="comment">//       argument to the right of the separator. You cannot use both arguments in a single use of the command.（互斥参数）</span>
+    <span class="comment">//   { } delimits a set of mutually exclusive arguments when one of the arguments is required. If the arguments are</span>
+    <span class="comment">//       optional, they are enclosed in brackets ([ ]).）（互斥分隔府）</span>
+    <span class="comment">// Example: add [-F file | -D dir]... [-f format] profile</span>
+    Use <a href="/pkg/builtin/#string">string</a>
+<span id="Command.Short"></span>    <span class="comment">// Short is the short description shown in the &#39;help&#39; output.</span>
+    <span class="comment">// Short 字段用于 help 中的简短描述</span>
+    Short <a href="/pkg/builtin/#string">string</a>
+<span id="Command.Long"></span>    <span class="comment">// Long is the long message shown in the &#39;help &lt;this-command&gt;&#39; output.</span>
+    <span class="comment">// Long 字段用于 help 中的长信息描述</span>
+    Long <a href="/pkg/builtin/#string">string</a>
+
+<span id="Command.Run"></span>    <span class="comment">// Run: Typically the actual work function. Most commands will only implement this.</span>
+    <span class="comment">// Run 函数由用户提供，描述执行指令的行为（无返回值）</span>
+    Run func(cmd *<a href="#Command">Command</a>, args []<a href="/pkg/builtin/#string">string</a>)
+<span id="Command.RunE"></span>    <span class="comment">// RunE: Run but returns an error.</span>
+    <span class="comment">// Run 函数由用户提供，描述执行指令的行为，返回可能产生的错误</span>
+    RunE func(cmd *<a href="#Command">Command</a>, args []<a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#error">error</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<h3 id="Command.AddCommand">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/utils.go?s=1167:1218#L39">AddCommand</a>
+				<a class="permalink" href="#Command.AddCommand">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) AddCommand(subCmds ...*<a href="#Command">Command</a>)</pre>
+			<p>
+				AddCommand adds one or more commands to this parent command.
+			</p>
+			<p>
+				AddCommand 函数为 cmd 指令增加子指令
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.Execute">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/command.go?s=3402:3437#L61">Execute</a>
+				<a class="permalink" href="#Command.Execute">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) Execute() <a href="/pkg/builtin/#error">error</a></pre>
+			<p>
+				Execute executes the command.
+			</p>
+			<p>
+				Execute 函数执行用户输入的指令，会解析出具体执行的指令并执行
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.Find">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/command.go?s=4470:4537#L102">Find</a>
+				<a class="permalink" href="#Command.Find">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) Find(args []<a href="/pkg/builtin/#string">string</a>) (*<a href="#Command">Command</a>, []<a href="/pkg/builtin/#string">string</a>, <a href="/pkg/builtin/#error">error</a>)</pre>
+			<p>
+				Find the target command given the args and command tree
+				Meant to be run on the highest node. Only searches down.
+			</p>
+			<p>
+				Find 函数为用户输入的 cmd 指令，找到并返回最终执行的子指令，并将剩余的参数作为 flags 返回
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.HelpFunc">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/help.go?s=271:326#L1">HelpFunc</a>
+				<a class="permalink" href="#Command.HelpFunc">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) HelpFunc() func(*<a href="#Command">Command</a>, []<a href="/pkg/builtin/#string">string</a>)</pre>
+			<p>
+				HelpFunc returns either the function set by SetHelpFunc for this command
+				or a parent, or it returns a function with default help behavior.
+			</p>
+			<p>
+				HelpFunc 函数返回执行 help 指令的函数，可以被用户自定义或继承实现
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.Name">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/utils.go?s=598:631#L12">Name</a>
+				<a class="permalink" href="#Command.Name">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) Name() <a href="/pkg/builtin/#string">string</a></pre>
+			<p>
+				Name returns the command&#39;s name: the first word in the use line.
+			</p>
+			<p>
+				Name 函数通过 Command.Use 字段返回 command 的名字（use 的首单词）
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.RemoveCommand">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/utils.go?s=1534:1587#L52">RemoveCommand</a>
+				<a class="permalink" href="#Command.RemoveCommand">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) RemoveCommand(rmCmds ...*<a href="#Command">Command</a>)</pre>
+			<p>
+				RemoveCommand removes one or more commands from a parent command.
+			</p>
+			<p>
+				RemoveCommand 函数为 cmd 指令移除子命令
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.Root">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/utils.go?s=802:837#L24">Root</a>
+				<a class="permalink" href="#Command.Root">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) Root() *<a href="#Command">Command</a></pre>
+			<p>
+				Root finds root command.
+			</p>
+			<p>
+				Root 函数返回指令的根指令
+			</p>
+
+
+
+
+
+
+			<h3 id="Command.SetHelpFunc">func (*Command) <a
+					href="/src/github.com/warpmatrix/simple-cobra/help.go?s=1947:2006#L57">SetHelpFunc</a>
+				<a class="permalink" href="#Command.SetHelpFunc">&#xb6;</a>
+
+
+			</h3>
+			<pre>func (cmd *<a href="#Command">Command</a>) SetHelpFunc(f func(*<a href="#Command">Command</a>, []<a href="/pkg/builtin/#string">string</a>))</pre>
+			<p>
+				SetHelpFunc sets help function. Can be defined by Application.
+			</p>
+			<p>
+				SetHelpFunc 函数可以让用户自定义 helpFunc 字段
+			</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			<div id="footer">
+				Build version go1.15.2.<br>
+				Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+				the content of this page is licensed under the
+				Creative Commons Attribution 3.0 License,
+				and code is licensed under a <a href="/LICENSE">BSD license</a>.<br>
+				<a href="/doc/tos.html">Terms of Service</a> |
+				<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+			</div>
+
+		</div><!-- .container -->
+	</div><!-- #page -->
+</body>
+
+</html>

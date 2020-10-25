@@ -1,3 +1,7 @@
+// Package cobra 实现了支持简单带子命令的命令行程序开发的功能。
+// 支持导入子命令目录，为开发的应用程序增加需要的自定义子命令。
+// 所有的子命令文件夹中，一个 go 文件对应应用程序中的一个子命令。
+// 可以通过增加或删除 go 文件，对直接对应用程序中的子命令进行改动。
 package cobra
 
 import (
@@ -18,44 +22,54 @@ import (
 type Command struct {
 	// Use is the one-line usage message.
 	// Recommended syntax is as follow:
-	//   [ ] identifies an optional argument. Arguments that are not enclosed in brackets are required.
-	//   ... indicates that you can specify multiple values for the previous argument.
+	// Use 字段描述指令的使用格式，支持的格式如下：
+	//   [ ] identifies an optional argument. Arguments that are not enclosed in brackets are required.（可选参数）
+	//   ... indicates that you can specify multiple values for the previous argument.（多值参数）
 	//   |   indicates mutually exclusive information. You can use the argument to the left of the separator or the
-	//       argument to the right of the separator. You cannot use both arguments in a single use of the command.
+	//       argument to the right of the separator. You cannot use both arguments in a single use of the command.（互斥参数）
 	//   { } delimits a set of mutually exclusive arguments when one of the arguments is required. If the arguments are
-	//       optional, they are enclosed in brackets ([ ]).
+	//       optional, they are enclosed in brackets ([ ]).）（互斥分隔府）
 	// Example: add [-F file | -D dir]... [-f format] profile
 	Use string
 	// Short is the short description shown in the 'help' output.
+	// Short 字段用于 help 中的简短描述
 	Short string
 	// Long is the long message shown in the 'help <this-command>' output.
+	// Long 字段用于 help 中的长信息描述
 	Long string
 
 	// Run: Typically the actual work function. Most commands will only implement this.
+	// Run 函数由用户提供，描述执行指令的行为（无返回值）
 	Run func(cmd *Command, args []string)
 	// RunE: Run but returns an error.
+	// Run 函数由用户提供，描述执行指令的行为，返回可能产生的错误
 	RunE func(cmd *Command, args []string) error
 
 	// helpFunc is help func defined by user.
+	// helpFunc 字段描述 help 指令执行的函数，系统会提供默认函数，可以被用户重定义
 	helpFunc func(*Command, []string)
 	// helpCommand is command with usage 'help'. If it's not defined by user,
 	// cobra uses default help command.
+	// helpCommand 字段系统为指令添加默认的 help 子指令，可以被用户重定义
 	helpCommand *Command
 
 	// args is actual args parsed from flags.
+	// args 字段可以通过配置文件读取指令默认的参数（尚未实现）
 	args []string
-	// flags is full secom/warpmatrix/simple-cobra"t of flags.
-	// flags *flag.FlagSet
 
 	// parent is a parent command for this command.
+	// parent 字段记录该指令的父指令
 	parent *Command
 	// commands is the list of commands supported by this program.
+	// commands 字段记录该指令的子指令集合
 	commands []*Command
 }
 
 // Execute executes the command.
+//
+// Execute 函数执行用户输入的指令，会解析出具体执行的指令并执行
 func (cmd *Command) Execute() error {
-	cmd.InitDefaultHelpCmd()
+	cmd.initDefaultHelpCmd()
 	args := cmd.args
 	// Workaround FAIL with "go test -v" or "cobra.test -test.v", see #155
 	if cmd.args == nil && filepath.Base(os.Args[0]) != "cobra.test" {
@@ -80,7 +94,7 @@ func (cmd *Command) execute(a []string) (err error) {
 	if cmd == nil {
 		return fmt.Errorf("Called Execute() on a nil Command")
 	}
-	if !cmd.Runnable() {
+	if !cmd.runnable() {
 		return flag.ErrHelp
 	}
 	if cmd.RunE != nil {

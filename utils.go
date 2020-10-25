@@ -29,6 +29,8 @@ func (cmd *Command) Name() string {
 }
 
 // Root finds root command.
+//
+// Root 函数返回指令的根指令
 func (cmd *Command) Root() *Command {
 	if cmd.parent != nil {
 		return cmd.parent.Root()
@@ -36,8 +38,8 @@ func (cmd *Command) Root() *Command {
 	return cmd
 }
 
-// Runnable determines if the command is itself runnable.
-func (cmd *Command) Runnable() bool {
+// runnable determines if the command is itself runnable.
+func (cmd *Command) runnable() bool {
 	return cmd.Run != nil || cmd.RunE != nil
 }
 
@@ -55,6 +57,8 @@ func (cmd *Command) AddCommand(subCmds ...*Command) {
 }
 
 // RemoveCommand removes one or more commands from a parent command.
+//
+// RemoveCommand 函数为 cmd 指令移除子命令
 func (cmd *Command) RemoveCommand(rmCmds ...*Command) {
 	commands := []*Command{}
 main:
