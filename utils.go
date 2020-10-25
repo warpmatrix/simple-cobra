@@ -43,33 +43,11 @@ func (cmd *Command) runnable() bool {
 	return cmd.Run != nil || cmd.RunE != nil
 }
 
-// AddCommand adds one or more commands to this parent command.
-//
-// AddCommand 函数为 cmd 指令增加子指令
-func (cmd *Command) AddCommand(subCmds ...*Command) {
-	for i, subCmd := range subCmds {
-		if subCmds[i] == cmd {
-			panic("Command can't be a child of itself")
+func (cmd *Command) findNext(next string) *Command {
+	for _, nextCmd := range cmd.commands {
+		if nextCmd.Name() == next {
+			return nextCmd
 		}
-		subCmds[i].parent = cmd
-		cmd.commands = append(cmd.commands, subCmd)
 	}
-}
-
-// RemoveCommand removes one or more commands from a parent command.
-//
-// RemoveCommand 函数为 cmd 指令移除子命令
-func (cmd *Command) RemoveCommand(rmCmds ...*Command) {
-	commands := []*Command{}
-main:
-	for _, command := range cmd.commands {
-		for _, rmCmd := range rmCmds {
-			if command == rmCmd {
-				command.parent = nil
-				continue main
-			}
-		}
-		commands = append(commands, command)
-	}
-	cmd.commands = commands
+	return nil
 }
